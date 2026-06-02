@@ -117,7 +117,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        // ========== FIREBASE CONFIG ==========
+        
         const firebaseConfig = {
             apiKey: "AIzaSyAXfH_DdBYRs_icgNVrs0CaEgGBovZU7C0",
             authDomain: "instgrab-eb68e.firebaseapp.com",
@@ -155,7 +155,7 @@
         let replyingTo = null;
         let shareMenuOpen = false;
 
-        // ========== HELPERS ==========
+        
         function getInitials(name) {
             if (!name || typeof name !== 'string') return 'U';
             const parts = name.trim().split(/\s+/);
@@ -197,7 +197,7 @@
             return `${Math.floor(diff/86400)}d ago`;
         }
 
-        // ========== PRESENCE with strict active tracking ==========
+    
         function updatePresence() {
             if (currentUser) {
                 db.collection('users').doc(currentUser.uid).update({ 
@@ -212,7 +212,7 @@
         document.addEventListener('click', () => { if (currentUser) updatePresence(); });
         document.addEventListener('keydown', () => { if (currentUser) updatePresence(); });
 
-        // ========== FOLLOW REQUESTS ==========
+        
         async function sendFollowRequest(userId) {
             const existing = await db.collection('followRequests').where('fromId','==',currentUser.uid).where('toId','==',userId).get();
             if (!existing.empty) { showToast('Request already sent'); return; }
@@ -251,12 +251,12 @@
             `).join('');
         }
 
-        // ========== INSTANT CHAT LIST (with cache) ==========
+    
         async function loadChatUsers() {
             const container = document.getElementById('usersList');
             if (!container) return;
             
-            // Show cached data instantly
+            
             if (cache.users.length > 0) {
                 displayChatUsers(cache.users);
             } else {
@@ -268,7 +268,7 @@
                 let allUsers = [];
                 usersSnap.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
                 
-                // Filter users with chat history (efficient parallel check)
+                
                 const chatUsers = [];
                 const promises = allUsers.map(async (user) => {
                     const chatId = [currentUser.uid, user.id].sort().join('_');
@@ -318,7 +318,7 @@
             }).join('');
         }
 
-        // ========== INSTANT DISCOVER ==========
+        
         async function loadDiscoverUsers() {
             const container = document.getElementById('discoverList');
             if (!container) return;
@@ -448,7 +448,7 @@
             });
         }
 
-        // ========== MESSAGING (INSTANT) ==========
+    
         async function sendMessage(attachmentUrl = null) {
             const inp = document.getElementById('messageInput');
             const text = inp?.value.trim();
@@ -480,7 +480,7 @@
             const ml = document.getElementById('messagesList');
             if (!ml || !selectedUser) return;
             
-            // Check cache first
+            
             const chatId = [currentUser.uid, selectedUser.id].sort().join('_');
             if (cache.messages.has(chatId)) {
                 displayMessages(cache.messages.get(chatId));
@@ -494,13 +494,13 @@
             cache.messages.set(chatId, msgs);
             displayMessages(msgs);
             
-            // Mark as read
+            
             const unread = msgs.filter(m => !m.read && m.receiverId === currentUser.uid);
             if (unread.length) {
                 const batch = db.batch();
                 unread.forEach(m => batch.update(db.collection(`chats/${chatId}/messages`).doc(m.id), { read: true }));
                 await batch.commit();
-                // Update cache
+                
                 unread.forEach(m => { m.read = true; });
                 cache.messages.set(chatId, msgs);
             }
@@ -662,7 +662,7 @@
             document.body.appendChild(modal);
         }
 
-        // ========== EDIT PROFILE ==========
+    
         async function loadEditProfile() {
             const doc = await db.collection('users').doc(currentUser.uid).get();
             const d = doc.data();
@@ -724,7 +724,7 @@
             loadProfile();
         }
 
-        // ========== RENDER ENGINE (ULTRA FAST) ==========
+    
         function render() {
             const appDiv = document.getElementById('app');
             if (!currentUser) {
@@ -733,7 +733,7 @@
                 return;
             }
             
-            // Use cached template if available
+            
             if (currentTab === 'chat' && selectedUser) {
                 appDiv.innerHTML = renderChat();
                 setTimeout(() => { attachChatEvents(); loadMessages(); }, 10);
@@ -758,7 +758,7 @@
             }
         }
 
-        // ========== UI TEMPLATES ==========
+        
         function renderLogin() { return `<div class="auth-container"><div class="auth-card"><h1><i class="fas fa-comment-dots"></i> InstaGrab</h1><p style="text-align:center;color:var(--text-secondary);margin-bottom:30px;">Connect, Chat, Share</p><form id="authForm"><input type="email" id="email" placeholder="Email" required><input type="password" id="password" placeholder="Password" required><button type="submit" class="btn-primary">Login</button></form><div style="text-align:center;"><button class="btn-secondary" onclick="switchTab('signup')">Create account</button></div></div></div>`; }
         function renderSignup() { return `<div class="auth-container"><div class="auth-card"><h2>Create Account</h2><div style="text-align:center;margin-bottom:15px;"><img id="signupAvatar" src="${getDefaultAvatar('User')}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid var(--primary);"><input type="file" id="signupPhoto" accept="image/*" style="display:none"><p style="font-size:12px;">Click to add photo</p></div><form id="authForm"><input type="text" id="username" placeholder="Username" required><input type="text" id="name" placeholder="Full Name"><input type="email" id="email" placeholder="Email" required><input type="password" id="password" placeholder="Password (6+)" required><input type="password" id="confirm" placeholder="Confirm" required><button type="submit" class="btn-primary">Sign Up</button></form><div style="text-align:center;"><button class="btn-secondary" onclick="switchTab('login')">Already have an account?</button></div></div></div>`; }
         function renderChatList() { const reqCount = followRequests.length; return `<div><div class="chat-header"><div><i class="fas fa-comment-dots" style="color:var(--primary);font-size:22px;"></i> <strong>InstaGrab</strong></div><div style="display:flex; gap:8px; align-items:center;"><div class="icon-btn" onclick="switchTab('notifications')" style="position:relative;"><i class="fas fa-bell"></i>${reqCount>0?`<span class="bell-badge">${reqCount}</span>`:''}</div><button class="icon-btn" onclick="switchTab('profile')"><img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName||'User')}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></button><button class="icon-btn" onclick="changeTheme()">${currentTheme === 'light' ? '<i class="fas fa-moon"></i>' : currentTheme === 'dark' ? '<i class="fas fa-rocket"></i>' : '<i class="fas fa-sun"></i>'}</button><button class="icon-btn" onclick="logout()" style="color:var(--error);"><i class="fas fa-sign-out-alt"></i></button></div></div><div id="usersList" class="users-list"><div class="loading">Loading chats...</div></div><div class="bottom-nav"><div class="nav-item ${currentTab==='chats'?'active':''}" onclick="switchTab('chats')"><i class="fas fa-comment"></i><span>Chats</span></div><div class="nav-item ${currentTab==='discover'?'active':''}" onclick="switchTab('discover')"><i class="fas fa-compass"></i><span>Discover</span></div><div class="nav-item ${currentTab==='profile'?'active':''}" onclick="switchTab('profile')"><i class="fas fa-user"></i><span>Profile</span></div></div></div>`; }
@@ -772,7 +772,7 @@
         function renderEditProfile() { return `<div><div class="chat-header"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></button><h2>Edit Profile</h2><button class="icon-btn" onclick="saveProfile()"><i class="fas fa-save"></i></button></div><div id="editProfileContainer" class="edit-container" style="padding:20px;text-align:center;"><img id="editAvatar" src="" style="width:100px;height:100px;border-radius:50%;border:3px solid var(--primary);cursor:pointer;margin-bottom:15px;"><input type="file" id="avatarUpload" accept="image/*" style="display:none"><p>Click photo</p><input type="text" id="editUsername" placeholder="Username" style="width:100%;padding:12px;margin:15px 0;border-radius:12px;border:1px solid var(--border);background:var(--input-bg);"><input type="text" id="editName" placeholder="Full Name" style="width:100%;padding:12px;margin-bottom:15px;border-radius:12px;"><textarea id="editBio" placeholder="Bio" rows="3" style="width:100%;padding:12px;border-radius:12px;"></textarea><div id="passwordSection"></div></div><div class="bottom-nav"><div class="nav-item" onclick="switchTab('chats')"><i class="fas fa-comment"></i><span>Chats</span></div><div class="nav-item" onclick="switchTab('discover')"><i class="fas fa-compass"></i><span>Discover</span></div><div class="nav-item active" onclick="switchTab('profile')"><i class="fas fa-user"></i><span>Profile</span></div></div></div>`; }
         function renderNotifications() { return `<div><div class="chat-header"><button class="back-btn" onclick="goBack()"><i class="fas fa-arrow-left"></i></button><h2>Follow Requests</h2></div><div id="requestsList" class="users-list"><div class="loading">Loading...</div></div><div class="bottom-nav"><div class="nav-item" onclick="switchTab('chats')"><i class="fas fa-comment"></i><span>Chats</span></div><div class="nav-item" onclick="switchTab('discover')"><i class="fas fa-compass"></i><span>Discover</span></div><div class="nav-item" onclick="switchTab('profile')"><i class="fas fa-user"></i><span>Profile</span></div></div></div>`; }
 
-        // ========== EVENT HANDLERS ==========
+        
         function attachAuthEvents() {
             const form = document.getElementById('authForm');
             if (!form) return;
@@ -850,7 +850,7 @@
         function changeTheme() { const themes = ['light','dark','futuristic']; currentTheme = themes[(themes.indexOf(currentTheme)+1)%3]; applyTheme(); render(); }
         async function logout() { if (currentUser) await db.collection('users').doc(currentUser.uid).update({ online: false }); await auth.signOut(); currentUser = null; currentTab = 'login'; render(); }
 
-        // ========== AUTH STATE ==========
+    
         auth.onAuthStateChanged(async (user) => {
             currentUser = user;
             if (user) {
