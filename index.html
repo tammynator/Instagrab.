@@ -3,49 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>InstaGrab - Chat with ease</title>
-    <link rel="icon" type="image/png" href="https://img.icons8.com/fluency/96/chat.png">
+    <title>InstaGrab</title>
+    <link rel="icon" type="image/png" href="https://img.icons8.com/color/96/chat--v1.png">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/color/96/chat--v1.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        /* Complete CSS same as before - included in full code below */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        /* Theme Variables - Global */
-        body.light {
-            --bg: #ffffff;
-            --surface: #f5f5f5;
-            --primary: #405DE6;
-            --text: #111111;
-            --text-secondary: #666666;
-            --border: #e0e0e0;
-            --online: #4caf50;
-            --offline: #9e9e9e;
-            --error: #f44336;
-            --input-bg: #ffffff;
-        }
-        body.dark {
-            --bg: #121212;
-            --surface: #1e1e1e;
-            --primary: #bb86fc;
-            --text: #eeeeee;
-            --text-secondary: #aaaaaa;
-            --border: #2c2c2c;
-            --online: #4caf50;
-            --offline: #757575;
-            --error: #cf6679;
-            --input-bg: #2c2c2c;
-        }
-        body.futuristic {
-            --bg: #0a0e27;
-            --surface: #16213e;
-            --primary: #00f2fe;
-            --text: #ffffff;
-            --text-secondary: #cbd5e1;
-            --border: #2d3748;
-            --online: #00ff88;
-            --offline: #4a5568;
-            --error: #ff006e;
-            --input-bg: #1a234a;
-        }
+        body.light { --bg: #ffffff; --surface: #f5f5f5; --primary: #405DE6; --text: #111; --text-secondary: #666; --border: #e0e0e0; --online: #4caf50; --offline: #9e9e9e; --error: #f44336; --input-bg: #fff; --notification: #ef4444; --success: #4caf50; }
+        body.dark { --bg: #121212; --surface: #1e1e1e; --primary: #bb86fc; --text: #eee; --text-secondary: #aaa; --border: #2c2c2c; --online: #4caf50; --offline: #757575; --error: #cf6679; --input-bg: #2c2c2c; --notification: #ef4444; --success: #4caf50; }
+        body.futuristic { --bg: #0a0e27; --surface: #16213e; --primary: #00f2fe; --text: #fff; --text-secondary: #cbd5e1; --border: #2d3748; --online: #0f0; --offline: #4a5568; --error: #f06; --input-bg: #1a234a; --notification: #ff4444; --success: #00ff88; }
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -54,13 +22,6 @@
             transition: background 0.2s;
         }
         
-        /* Chat Theme Overrides */
-        .chat-theme-default { }
-        .chat-theme-romantic { --chat-bg: #ffe6f0; --chat-primary: #ff6b9d; --chat-surface: #fff0f5; }
-        .chat-theme-dark { --chat-bg: #1a1a2e; --chat-primary: #16213e; --chat-surface: #0f3460; }
-        .chat-theme-nature { --chat-bg: #e8f5e9; --chat-primary: #2e7d32; --chat-surface: #c8e6c9; }
-        
-        /* Auth */
         .auth-container {
             min-height: 100vh;
             display: flex;
@@ -76,8 +37,9 @@
             width: 100%;
             max-width: 400px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
         }
-        .auth-card h1 { color: #405DE6; text-align: center; font-size: 42px; margin-bottom: 20px; }
+        .auth-icon { font-size: 60px; margin-bottom: 15px; }
         .auth-card input {
             width: 100%; padding: 14px; margin-bottom: 15px;
             border: 1px solid #ddd; border-radius: 12px;
@@ -96,7 +58,6 @@
             margin-top: 15px; font-size: 14px;
         }
         
-        /* Header */
         .header {
             background: var(--surface);
             padding: 12px 16px;
@@ -108,7 +69,9 @@
             top: 0;
             z-index: 100;
         }
-        .header h2 { font-size: 20px; color: var(--primary); }
+        .logo { display: flex; align-items: center; gap: 8px; }
+        .logo-icon { font-size: 28px; }
+        .logo-text { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, var(--primary), #833AB4); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .header-icons { display: flex; gap: 12px; align-items: center; }
         .icon-btn {
             background: none; border: none;
@@ -117,8 +80,22 @@
             color: var(--text);
             position: relative;
         }
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--notification);
+            color: white;
+            border-radius: 50%;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
         
-        /* Bottom Navigation */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -143,16 +120,27 @@
             cursor: pointer;
             padding: 6px 12px;
             border-radius: 12px;
+            position: relative;
         }
         .nav-item.active { color: var(--primary); }
         .nav-item i { font-size: 22px; }
-        .nav-avatar {
-            width: 28px; height: 28px;
+        .nav-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--notification);
+            color: white;
             border-radius: 50%;
-            object-fit: cover;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
         }
+        .nav-avatar { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
         
-        /* User Card */
         .users-list, .discover-list {
             padding: 10px;
             padding-bottom: 70px;
@@ -166,17 +154,12 @@
             border-radius: 14px;
             margin-bottom: 10px;
             cursor: pointer;
-            position: relative;
+            transition: 0.1s;
         }
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            margin-right: 14px;
-            object-fit: cover;
-            position: relative;
-        }
-        .online-indicator {
+        .user-card:active { transform: scale(0.99); }
+        .avatar-container { position: relative; margin-right: 14px; }
+        .avatar { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+        .online-dot {
             position: absolute;
             bottom: 2px;
             right: 2px;
@@ -188,7 +171,8 @@
         .user-details { flex: 1; }
         .user-name { font-weight: 600; font-size: 15px; }
         .user-bio { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
-        .notification-badge {
+        .last-msg { font-size: 11px; color: var(--text-secondary); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+        .unread-badge {
             background: var(--error);
             color: white;
             border-radius: 50%;
@@ -199,10 +183,8 @@
             justify-content: center;
             font-size: 11px;
             font-weight: bold;
-            padding: 0 5px;
         }
         
-        /* Chat */
         .chat-container { height: 100vh; display: flex; flex-direction: column; }
         .chat-header {
             background: var(--surface);
@@ -212,7 +194,6 @@
             align-items: center;
             gap: 12px;
         }
-        .chat-header-avatar { cursor: pointer; }
         .back-btn {
             background: none; border: none;
             font-size: 24px; cursor: pointer;
@@ -225,7 +206,6 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            background: var(--chat-bg, var(--bg));
         }
         .message {
             max-width: 75%;
@@ -233,15 +213,16 @@
             border-radius: 18px;
             font-size: 14px;
             word-wrap: break-word;
+            position: relative;
         }
         .message-mine {
-            background: var(--chat-primary, var(--primary));
+            background: var(--primary);
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
         .message-theirs {
-            background: var(--chat-surface, var(--surface));
+            background: var(--surface);
             border: 1px solid var(--border);
             align-self: flex-start;
             border-bottom-left-radius: 4px;
@@ -251,6 +232,18 @@
             opacity: 0.7;
             margin-top: 4px;
             text-align: right;
+        }
+        .message-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 4px;
+        }
+        .message-actions button {
+            background: none; border: none;
+            font-size: 12px;
+            cursor: pointer;
+            color: var(--text-secondary);
         }
         .input-area {
             padding: 12px 16px;
@@ -268,8 +261,8 @@
             color: var(--text);
             font-size: 15px;
         }
+        .input-area input:focus { outline: none; border-color: var(--primary); }
         
-        /* Profile */
         .profile-container { min-height: 100vh; padding-bottom: 70px; }
         .profile-header {
             background: var(--surface);
@@ -303,7 +296,6 @@
         .stat-number { font-size: 22px; font-weight: bold; }
         .stat-label { font-size: 12px; color: var(--text-secondary); }
         
-        /* Edit Profile Modal */
         .modal {
             position: fixed;
             top: 0; left: 0;
@@ -323,16 +315,15 @@
             max-height: 80%;
             overflow-y: auto;
         }
-        .theme-option {
+        .notification-item {
             padding: 12px;
             border-bottom: 1px solid var(--border);
-            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 12px;
         }
         
-        .loading { text-align: center; padding: 50px; color: var(--text-secondary); }
+        .loading { text-align: center; padding: 40px; color: var(--text-secondary); }
         .toast {
             position: fixed;
             bottom: 80px;
@@ -346,8 +337,6 @@
             font-size: 13px;
             border: 1px solid var(--border);
         }
-        
-        .file-input { display: none; }
         
         @media (max-width: 768px) {
             .message { max-width: 85%; }
@@ -364,7 +353,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        // ========== FIREBASE CONFIG ==========
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyAXfH_DdBYRs_icgNVrs0CaEgGBovZU7C0",
             authDomain: "instgrab-eb68e.firebaseapp.com",
@@ -378,20 +367,41 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // ========== APP STATE ==========
+        // Request notification permission
+        if ('Notification' in window && Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        }
+        
+        function playNotificationSound() {
+            try {
+                let audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+                audio.volume = 0.3;
+                audio.play().catch(()=>{});
+            } catch(e) {}
+        }
+        
+        function sendPushNotification(title, body, icon) {
+            if (Notification.permission === 'granted') {
+                new Notification(title, { body, icon: icon || 'https://img.icons8.com/color/96/chat--v1.png' });
+                playNotificationSound();
+            }
+        }
+        
         let currentUser = null;
         let currentTheme = localStorage.getItem('theme') || 'light';
-        let currentScreen = 'login';
+        let currentTab = 'login';
         let selectedUser = null;
-        let viewingProfileUser = null;
-        let usersCache = [];
+        let viewingUser = null;
+        let chatUsers = [];
         let unreadCounts = new Map();
         let lastMessages = new Map();
-        let messagesUnsubscribe = null;
-        let chatThemes = JSON.parse(localStorage.getItem('chatThemes') || '{}');
+        let lastTimes = new Map();
+        let messagesUnsub = null;
         let pendingFile = null;
+        let notifications = [];
+        let notifCount = 0;
+        let chatListenerActive = false;
         
-        // Cloudinary Config
         const CLOUD_NAME = "dx1irhsdq";
         const UPLOAD_PRESET = "instagrab_preset";
         
@@ -403,7 +413,6 @@
             return res.data.secure_url;
         }
         
-        // ========== HELPERS ==========
         function getDefaultAvatar(name) {
             let initial = name ? name.charAt(0).toUpperCase() : 'U';
             return `https://ui-avatars.com/api/?background=405DE6&color=fff&size=120&name=${initial}`;
@@ -416,7 +425,7 @@
             toast.className = 'toast';
             toast.textContent = msg;
             document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2500);
+            setTimeout(() => toast.remove(), 2000);
         }
         
         function applyTheme() {
@@ -432,102 +441,194 @@
             return div.innerHTML;
         }
         
-        // ========== PRESENCE ==========
+        function formatTime(date) {
+            if (!date) return '';
+            let now = new Date();
+            let diff = now - date;
+            let mins = Math.floor(diff / 60000);
+            let hours = Math.floor(diff / 3600000);
+            let days = Math.floor(diff / 86400000);
+            if (mins < 1) return 'Just now';
+            if (mins < 60) return `${mins}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
+        }
+        
+        function getBadge(count) {
+            if (count === 0) return '';
+            return count > 9 ? '9+' : count.toString();
+        }
+        
         function updatePresence(online) {
             if (currentUser) {
                 db.collection('users').doc(currentUser.uid).update({ online, lastSeen: new Date() }).catch(()=>{});
             }
         }
+        window.addEventListener('load', () => updatePresence(true));
+        window.addEventListener('beforeunload', () => updatePresence(false));
+        document.addEventListener('visibilitychange', () => updatePresence(!document.hidden));
         
-        window.addEventListener('load', () => { updatePresence(true); });
-        window.addEventListener('beforeunload', () => { updatePresence(false); });
-        document.addEventListener('visibilitychange', () => { updatePresence(!document.hidden); });
+        async function loadNotifications() {
+            if (!currentUser) return;
+            try {
+                let followSnap = await db.collection('followRequests').where('toId', '==', currentUser.uid).where('status', '==', 'pending').get();
+                let msgSnap = await db.collection('messageRequests').where('toId', '==', currentUser.uid).where('status', '==', 'pending').get();
+                let all = [];
+                followSnap.forEach(d => {
+                    let data = d.data();
+                    all.push({ id: d.id, type: 'follow', fromId: data.fromId, fromName: data.fromName, fromPhoto: data.fromPhoto, msg: `${data.fromName} wants to follow you`, time: data.createdAt?.toDate?.() || new Date() });
+                });
+                msgSnap.forEach(d => {
+                    let data = d.data();
+                    all.push({ id: d.id, type: 'message', fromId: data.fromId, fromName: data.fromName, fromPhoto: data.fromPhoto, msg: `Message request from ${data.fromName}`, time: data.createdAt?.toDate?.() || new Date() });
+                });
+                all.sort((a,b) => b.time - a.time);
+                notifications = all;
+                notifCount = all.length;
+                render();
+            } catch(e) { console.error(e); }
+        }
         
-        // ========== LOAD USERS (CACHED) ==========
-        async function loadUsers() {
-            let container = document.getElementById('usersList');
-            if (!container) return;
-            
-            if (usersCache.length > 0) {
-                displayUsers(usersCache);
+        function showNotifModal() {
+            if (notifications.length === 0) { showToast('No notifications'); return; }
+            let modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3 style="margin-bottom:15px;">Notifications (${notifCount})</h3>
+                    ${notifications.map(n => `
+                        <div class="notification-item">
+                            <img src="${n.fromPhoto || getDefaultAvatar(n.fromName)}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;">
+                            <div style="flex:1;">
+                                <div style="font-weight:600;">${escapeHtml(n.fromName)}</div>
+                                <div style="font-size:12px;color:var(--text-secondary);">${escapeHtml(n.msg)}</div>
+                                <div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">${formatTime(n.time)}</div>
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn" onclick="handleNotif('accept','${n.id}','${n.type}','${n.fromId}');this.closest('.modal').remove();" style="padding:6px 12px;font-size:12px;width:auto;">Accept</button>
+                                <button class="btn" onclick="handleNotif('reject','${n.id}','${n.type}');this.closest('.modal').remove();" style="padding:6px 12px;font-size:12px;width:auto;background:var(--error);">Reject</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                    <button class="btn" onclick="this.closest('.modal').remove()" style="margin-top:15px;">Close</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        async function handleNotif(action, id, type, fromId) {
+            if (action === 'accept') {
+                if (type === 'follow') {
+                    await db.collection('followRequests').doc(id).update({ status: 'accepted' });
+                    await db.collection('users').doc(currentUser.uid).update({ followers: firebase.firestore.FieldValue.arrayUnion(fromId) });
+                    await db.collection('users').doc(fromId).update({ following: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) });
+                    showToast('Follow request accepted');
+                } else {
+                    await db.collection('messageRequests').doc(id).update({ status: 'accepted' });
+                    showToast('Message request accepted');
+                }
             } else {
-                container.innerHTML = '<div class="loading">Loading users...</div>';
+                if (type === 'follow') await db.collection('followRequests').doc(id).update({ status: 'rejected' });
+                else await db.collection('messageRequests').doc(id).update({ status: 'rejected' });
+                showToast('Request rejected');
             }
+            await loadNotifications();
+            render();
+        }
+        
+        // 🔥 MAIN FUNCTION - Loads chat users sorted by latest message
+        async function loadChatUsers() {
+            let container = document.getElementById('usersList');
+            if (!container || chatListenerActive) return;
+            
+            chatListenerActive = true;
+            container.innerHTML = '<div class="loading">Loading chats...</div>';
             
             try {
                 let snapshot = await db.collection('users').where('uid', '!=', currentUser.uid).get();
-                let users = [];
-                snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+                let all = [];
+                snapshot.forEach(doc => all.push({ id: doc.id, ...doc.data() }));
                 
-                await Promise.all(users.map(async (user) => {
+                let chatUsersList = [];
+                for (let user of all) {
                     let chatId = [currentUser.uid, user.id].sort().join('_');
                     let lastMsg = await db.collection(`chats/${chatId}/messages`).orderBy('timestamp', 'desc').limit(1).get();
                     if (!lastMsg.empty) {
-                        lastMessages.set(user.id, lastMsg.docs[0].data().text || '📎');
+                        let data = lastMsg.docs[0].data();
+                        lastMessages.set(user.id, data.text || '📎');
+                        // 🔥 Store the timestamp of the latest message
+                        lastTimes.set(user.id, data.timestamp?.toDate?.() || new Date(0));
+                        let unread = await db.collection(`chats/${chatId}/messages`).where('receiverId', '==', currentUser.uid).where('read', '==', false).get();
+                        unreadCounts.set(user.id, unread.size);
+                        chatUsersList.push(user);
                     }
-                    let unread = await db.collection(`chats/${chatId}/messages`).where('receiverId', '==', currentUser.uid).where('read', '==', false).get();
-                    unreadCounts.set(user.id, unread.size);
-                }));
+                }
                 
-                usersCache = users;
-                displayUsers(users);
-            } catch(err) { console.error(err); }
+                // 🔥 Sort by latest message time (newest first)
+                chatUsersList.sort((a, b) => {
+                    let timeA = lastTimes.get(a.id) || new Date(0);
+                    let timeB = lastTimes.get(b.id) || new Date(0);
+                    return timeB - timeA;
+                });
+                
+                chatUsers = chatUsersList;
+                
+                if (chatUsers.length === 0) {
+                    container.innerHTML = '<div class="loading">✨ No chats yet! Go to Discover to find friends.</div>';
+                    return;
+                }
+                
+                container.innerHTML = chatUsers.map(user => {
+                    let unread = unreadCounts.get(user.id) || 0;
+                    let last = lastMessages.get(user.id) || '';
+                    let avatar = user.photoURL || getDefaultAvatar(user.username);
+                    let unreadBadge = unread > 9 ? '9+' : (unread > 0 ? unread : '');
+                    let time = lastTimes.get(user.id);
+                    let timeDisplay = time ? formatTime(time) : '';
+                    
+                    return `
+                        <div class="user-card" onclick="openChat('${user.id}')">
+                            <div class="avatar-container">
+                                <img src="${avatar}" class="avatar" onerror="this.src='${getDefaultAvatar(user.username)}'">
+                                <div class="online-dot" style="background: ${user.online ? 'var(--online)' : 'var(--offline)'};"></div>
+                            </div>
+                            <div class="user-details">
+                                <div class="user-name">${escapeHtml(user.username)}</div>
+                                <div class="last-msg">${last ? escapeHtml(last.substring(0,40)) : 'Say hi!'}</div>
+                            </div>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                ${timeDisplay ? `<div style="font-size:10px;color:var(--text-secondary);">${timeDisplay}</div>` : ''}
+                                ${unreadBadge ? `<div class="unread-badge">${unreadBadge}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch(e) { console.error(e); }
+            chatListenerActive = false;
         }
         
-        function displayUsers(users) {
-            let container = document.getElementById('usersList');
-            if (!container) return;
-            if (users.length === 0) {
-                container.innerHTML = '<div class="loading">No users yet</div>';
-                return;
-            }
-            
-            container.innerHTML = users.map(user => {
-                let unread = unreadCounts.get(user.id) || 0;
-                let lastMsg = lastMessages.get(user.id) || '';
-                let avatar = user.photoURL || getDefaultAvatar(user.username);
-                return `
-                    <div class="user-card" onclick="openChat('${user.id}')">
-                        <div style="position: relative;">
-                            <img src="${avatar}" class="avatar" onerror="this.src='${getDefaultAvatar(user.username)}'">
-                            <div class="online-indicator" style="background: ${user.online ? 'var(--online)' : 'var(--offline)'};"></div>
-                        </div>
-                        <div class="user-details">
-                            <div class="user-name">${escapeHtml(user.username)}</div>
-                            <div class="user-bio">${lastMsg ? escapeHtml(lastMsg.substring(0, 40)) : 'No messages yet'}</div>
-                        </div>
-                        ${unread > 0 ? `<div class="notification-badge">${unread > 9 ? '9+' : unread}</div>` : ''}
-                    </div>
-                `;
-            }).join('');
-        }
-        
-        // ========== DISCOVER USERS ==========
-        async function loadDiscover() {
+        async function loadDiscoverUsers() {
             let container = document.getElementById('discoverList');
             if (!container) return;
-            container.innerHTML = '<div class="loading">Loading users...</div>';
-            
+            container.innerHTML = '<div class="loading">Finding users...</div>';
             try {
                 let snapshot = await db.collection('users').where('uid', '!=', currentUser.uid).get();
                 let users = [];
                 snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
-                
-                for (let user of users) {
-                    user.isFollowing = user.followers?.includes(currentUser.uid) || false;
+                for (let u of users) {
+                    u.isFollowing = u.followers?.includes(currentUser.uid) || false;
                 }
-                
                 container.innerHTML = users.map(user => {
                     let avatar = user.photoURL || getDefaultAvatar(user.username);
                     let followBtn = user.isFollowing ? 
-                        `<button class="btn" style="padding:8px 16px; font-size:12px; width:auto; background:var(--text-secondary);" onclick="event.stopPropagation(); unfollowUser('${user.id}')">Following</button>` :
-                        `<button class="btn" style="padding:8px 16px; font-size:12px; width:auto;" onclick="event.stopPropagation(); followUser('${user.id}')">Follow</button>`;
-                    
+                        `<button class="btn" style="padding:6px 16px; font-size:12px; width:auto; background:var(--text-secondary);" onclick="event.stopPropagation(); handleFollow('unfollow','${user.id}')">Following</button>` :
+                        `<button class="btn" style="padding:6px 16px; font-size:12px; width:auto;" onclick="event.stopPropagation(); handleFollow('follow','${user.id}')">Follow</button>`;
                     return `
                         <div class="user-card" onclick="viewProfile('${user.id}')">
-                            <div style="position: relative;">
+                            <div class="avatar-container">
                                 <img src="${avatar}" class="avatar" onerror="this.src='${getDefaultAvatar(user.username)}'">
-                                <div class="online-indicator" style="background: ${user.online ? 'var(--online)' : 'var(--offline)'};"></div>
+                                <div class="online-dot" style="background: ${user.online ? 'var(--online)' : 'var(--offline)'};"></div>
                             </div>
                             <div class="user-details">
                                 <div class="user-name">${escapeHtml(user.username)}</div>
@@ -538,127 +639,132 @@
                         </div>
                     `;
                 }).join('');
-            } catch(err) { console.error(err); }
+            } catch(e) { console.error(e); }
         }
         
-        // ========== CHAT ==========
+        async function handleFollow(action, userId) {
+            let userRef = db.collection('users').doc(userId);
+            let curRef = db.collection('users').doc(currentUser.uid);
+            let userDoc = await userRef.get();
+            if (action === 'follow') {
+                await userRef.update({ followers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) });
+                await curRef.update({ following: firebase.firestore.FieldValue.arrayUnion(userId) });
+                showToast(`Following ${userDoc.data().username}`);
+                await db.collection('followRequests').add({
+                    fromId: currentUser.uid, fromName: currentUser.displayName, fromPhoto: currentUser.photoURL,
+                    toId: userId, status: 'pending', createdAt: new Date()
+                });
+            } else {
+                await userRef.update({ followers: firebase.firestore.FieldValue.arrayRemove(currentUser.uid) });
+                await curRef.update({ following: firebase.firestore.FieldValue.arrayRemove(userId) });
+                showToast(`Unfollowed ${userDoc.data().username}`);
+            }
+            loadDiscoverUsers();
+            loadNotifications();
+        }
+        
         async function openChat(userId) {
+            await db.collection('messageRequests').where('fromId','==',userId).where('toId','==',currentUser.uid).where('status','==','pending').get().then(snap => {
+                snap.forEach(d => d.ref.update({ status: 'accepted' }));
+            });
+            await loadNotifications();
             let userDoc = await db.collection('users').doc(userId).get();
             if (userDoc.exists) {
                 selectedUser = { id: userDoc.id, ...userDoc.data() };
-                currentScreen = 'chat';
+                currentTab = 'chat';
                 render();
             }
         }
         
-        function getChatTheme() {
-            let themeKey = [currentUser.uid, selectedUser?.id].sort().join('_');
-            return chatThemes[themeKey] || 'default';
+        async function editMessage(msgId, oldText) {
+            let newText = prompt('Edit message:', oldText);
+            if (!newText || newText === oldText) return;
+            let chatId = [currentUser.uid, selectedUser.id].sort().join('_');
+            await db.collection(`chats/${chatId}/messages`).doc(msgId).update({ text: newText, edited: true });
+            showToast('Message edited');
         }
         
-        function getChatThemeColors(themeName) {
-            switch(themeName) {
-                case 'romantic': return { bg: '#ffe6f0', primary: '#ff6b9d', surface: '#fff0f5' };
-                case 'dark': return { bg: '#1a1a2e', primary: '#16213e', surface: '#0f3460' };
-                case 'nature': return { bg: '#e8f5e9', primary: '#2e7d32', surface: '#c8e6c9' };
-                default: return { bg: 'var(--bg)', primary: 'var(--primary)', surface: 'var(--surface)' };
-            }
+        async function deleteMessage(msgId) {
+            if (!confirm('Delete this message?')) return;
+            let chatId = [currentUser.uid, selectedUser.id].sort().join('_');
+            await db.collection(`chats/${chatId}/messages`).doc(msgId).update({ deleted: true, text: 'Message deleted' });
+            showToast('Message deleted');
         }
         
         async function loadMessages() {
             let container = document.getElementById('messagesArea');
             if (!container || !selectedUser) return;
-            
-            // Apply chat theme
-            let themeName = getChatTheme();
-            let colors = getChatThemeColors(themeName);
-            container.style.setProperty('--chat-bg', colors.bg);
-            container.style.setProperty('--chat-primary', colors.primary);
-            container.style.setProperty('--chat-surface', colors.surface);
-            
             let chatId = [currentUser.uid, selectedUser.id].sort().join('_');
-            
-            if (messagesUnsubscribe) messagesUnsubscribe();
-            messagesUnsubscribe = db.collection(`chats/${chatId}/messages`)
-                .orderBy('timestamp')
-                .onSnapshot(snapshot => {
-                    if (snapshot.empty) {
-                        container.innerHTML = '<div class="loading">No messages yet</div>';
-                        return;
-                    }
-                    let messages = [];
-                    snapshot.forEach(doc => {
-                        let data = doc.data();
-                        messages.push({
-                            id: doc.id,
-                            text: data.text,
-                            senderId: data.senderId,
-                            timestamp: data.timestamp?.toDate?.() || new Date(),
-                            read: data.read,
-                            attachment: data.attachment
-                        });
-                    });
-                    
-                    container.innerHTML = messages.map(msg => {
-                        let isMine = msg.senderId === currentUser.uid;
-                        let time = msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        let status = isMine ? (msg.read ? 'Seen' : 'Sent') : '';
-                        let content = '';
-                        if (msg.attachment) {
-                            content = `<img src="${msg.attachment}" style="max-width: 200px; max-height: 200px; border-radius: 10px; cursor: pointer;" onclick="window.open('${msg.attachment}','_blank')">`;
-                        } else {
-                            content = escapeHtml(msg.text);
-                        }
-                        return `
-                            <div class="message ${isMine ? 'message-mine' : 'message-theirs'}">
-                                ${content}
-                                <div class="message-time">${time} <span style="font-size: 10px;">${status}</span></div>
-                            </div>
-                        `;
-                    }).join('');
-                    container.scrollTop = container.scrollHeight;
-                    
-                    let unread = messages.filter(m => !m.read && m.senderId !== currentUser.uid);
-                    if (unread.length) {
-                        let batch = db.batch();
-                        unread.forEach(m => batch.update(db.collection(`chats/${chatId}/messages`).doc(m.id), { read: true }));
-                        batch.commit();
-                    }
+            if (messagesUnsub) messagesUnsub();
+            messagesUnsub = db.collection(`chats/${chatId}/messages`).orderBy('timestamp').onSnapshot(async snap => {
+                if (snap.empty) { container.innerHTML = '<div class="loading">No messages yet</div>'; return; }
+                let msgs = [];
+                snap.forEach(d => {
+                    let data = d.data();
+                    msgs.push({ id: d.id, text: data.text, senderId: data.senderId, timestamp: data.timestamp?.toDate?.() || new Date(), read: data.read, attachment: data.attachment, edited: data.edited, deleted: data.deleted });
                 });
+                container.innerHTML = msgs.map(m => {
+                    let isMine = m.senderId === currentUser.uid;
+                    let time = m.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    let status = isMine ? (m.read ? 'Seen' : 'Sent') : '';
+                    let content = '';
+                    if (m.deleted) {
+                        content = '<em>Message deleted</em>';
+                    } else if (m.attachment) {
+                        content = `<img src="${m.attachment}" style="max-width:200px;max-height:200px;border-radius:10px;cursor:pointer;" onclick="window.open('${m.attachment}','_blank')">`;
+                    } else {
+                        content = escapeHtml(m.text);
+                    }
+                    let editedBadge = m.edited ? ' <span style="font-size:10px;">(edited)</span>' : '';
+                    let actions = '';
+                    if (isMine && !m.deleted) {
+                        actions = `<div class="message-actions">
+                            <button onclick="editMessage('${m.id}','${escapeHtml(m.text).replace(/'/g, "\\'")}')">✏️ Edit</button>
+                            <button onclick="deleteMessage('${m.id}')">🗑️ Delete</button>
+                        </div>`;
+                    }
+                    return `
+                        <div class="message ${isMine ? 'message-mine' : 'message-theirs'}">
+                            ${content}${editedBadge}
+                            <div class="message-time">${time} <span style="font-size:10px;">${status}</span></div>
+                            ${actions}
+                        </div>
+                    `;
+                }).join('');
+                container.scrollTop = container.scrollHeight;
+                let unread = msgs.filter(m => !m.read && m.senderId !== currentUser.uid);
+                if (unread.length) {
+                    let batch = db.batch();
+                    unread.forEach(m => batch.update(db.collection(`chats/${chatId}/messages`).doc(m.id), { read: true }));
+                    await batch.commit();
+                    if (currentTab === 'chat') {
+                        sendPushNotification(`New message from ${selectedUser.username}`, msgs[msgs.length-1]?.text || 'Sent you a message', selectedUser.photoURL);
+                    }
+                }
+            });
         }
         
         async function sendMessage() {
             let input = document.getElementById('messageInput');
             let text = input?.value.trim();
             if (!text && !pendingFile) return;
-            
             let chatId = [currentUser.uid, selectedUser.id].sort().join('_');
-            
             if (pendingFile) {
                 try {
                     let url = await uploadToCloudinary(pendingFile);
-                    await db.collection(`chats/${chatId}/messages`).add({
-                        attachment: url,
-                        senderId: currentUser.uid,
-                        receiverId: selectedUser.id,
-                        timestamp: new Date(),
-                        read: false
-                    });
+                    await db.collection(`chats/${chatId}/messages`).add({ attachment: url, senderId: currentUser.uid, receiverId: selectedUser.id, timestamp: new Date(), read: false });
                     pendingFile = null;
                     document.getElementById('filePreview')?.remove();
                     showToast('Image sent!');
-                } catch(err) { showToast('Upload failed'); }
+                } catch(e) { showToast('Upload failed'); }
             }
-            
             if (text) {
-                await db.collection(`chats/${chatId}/messages`).add({
-                    text: text,
-                    senderId: currentUser.uid,
-                    receiverId: selectedUser.id,
-                    timestamp: new Date(),
-                    read: false
-                });
+                await db.collection(`chats/${chatId}/messages`).add({ text, senderId: currentUser.uid, receiverId: selectedUser.id, timestamp: new Date(), read: false });
                 input.value = '';
+                // Update last message time for sorting
+                lastTimes.set(selectedUser.id, new Date());
+                // Refresh chat list to re-sort
+                setTimeout(() => loadChatUsers(), 100);
             }
         }
         
@@ -674,28 +780,22 @@
                     if (!preview) {
                         preview = document.createElement('div');
                         preview.id = 'filePreview';
-                        preview.style.cssText = 'position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--surface); padding: 10px 15px; border-radius: 20px; display: flex; gap: 10px; align-items: center; z-index: 1000; border: 1px solid var(--border);';
+                        preview.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--surface);padding:10px 15px;border-radius:20px;display:flex;gap:10px;z-index:1000;border:1px solid var(--border);';
                         document.body.appendChild(preview);
                     }
                     let reader = new FileReader();
-                    reader.onload = (ev) => {
-                        preview.innerHTML = `<img src="${ev.target.result}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;"><span>${file.name.substring(0, 20)}</span><button onclick="cancelAttachment()" style="background: none; border: none; font-size: 18px; cursor: pointer;">✕</button>`;
-                    };
+                    reader.onload = (ev) => { preview.innerHTML = `<img src="${ev.target.result}" style="width:40px;height:40px;border-radius:8px;"><span>${file.name.substring(0,20)}</span><button onclick="cancelAttachment()">✕</button>`; };
                     reader.readAsDataURL(file);
                 }
             };
             input.click();
         }
         
-        function cancelAttachment() {
-            pendingFile = null;
-            document.getElementById('filePreview')?.remove();
-        }
+        function cancelAttachment() { pendingFile = null; document.getElementById('filePreview')?.remove(); }
         
-        // ========== PROFILE & FOLLOW ==========
         async function viewProfile(userId) {
-            viewingProfileUser = userId;
-            currentScreen = 'viewProfile';
+            viewingUser = userId;
+            currentTab = 'viewProfile';
             render();
         }
         
@@ -703,42 +803,57 @@
             let uid = userId || currentUser.uid;
             let container = document.getElementById('profileContent');
             if (!container) return;
-            
             let doc = await db.collection('users').doc(uid).get();
             let user = doc.data();
             let avatar = user.photoURL || getDefaultAvatar(user.username);
             let isOwn = uid === currentUser.uid;
             let isFollowing = user.followers?.includes(currentUser.uid) || false;
-            
             container.innerHTML = `
-                <div style="padding: 20px;">
-                    <img src="${avatar}" class="profile-avatar" onerror="this.src='${getDefaultAvatar(user.username)}'" ${isOwn ? 'onclick="editProfilePhoto()"' : ''}>
-                    <h2 style="text-align: center;">${escapeHtml(user.username)}</h2>
-                    <p style="text-align: center; color: var(--text-secondary);">${escapeHtml(user.name || user.username)}</p>
-                    <div class="profile-bio" style="text-align: center; padding: 0 20px; color: var(--text-secondary);">${user.bio || 'No bio yet'}</div>
+                <div style="padding:20px;">
+                    <img src="${avatar}" class="profile-avatar" onerror="this.src='${getDefaultAvatar(user.username)}'" ${isOwn ? 'onclick="editPhoto()"' : ''}>
+                    <h2 style="text-align:center;">${escapeHtml(user.username)}</h2>
+                    <p style="text-align:center;color:var(--text-secondary);">${escapeHtml(user.name || user.username)}</p>
+                    <div style="text-align:center;padding:0 20px;color:var(--text-secondary);">${user.bio || 'No bio yet'}</div>
                     <div class="profile-stats">
-                        <div class="stat" onclick="showFollowList('followers', '${uid}')">
-                            <div class="stat-number">${user.followers?.length || 0}</div>
-                            <div class="stat-label">Followers</div>
-                        </div>
-                        <div class="stat" onclick="showFollowList('following', '${uid}')">
-                            <div class="stat-number">${user.following?.length || 0}</div>
-                            <div class="stat-label">Following</div>
-                        </div>
+                        <div class="stat" onclick="showFollowList('followers','${uid}')"><div class="stat-number">${user.followers?.length || 0}</div><div class="stat-label">Followers</div></div>
+                        <div class="stat" onclick="showFollowList('following','${uid}')"><div class="stat-number">${user.following?.length || 0}</div><div class="stat-label">Following</div></div>
                     </div>
                     ${!isOwn ? `
-                        <button class="btn" onclick="followUser('${uid}')" style="margin-bottom: 10px;">${isFollowing ? 'Unfollow' : 'Follow'}</button>
-                        <button class="btn" onclick="openChat('${uid}')" style="background: var(--text-secondary);">Send Message</button>
+                        <button class="btn" onclick="handleProfileFollow('${uid}')" style="margin-bottom:10px;">${isFollowing ? 'Unfollow' : 'Follow'}</button>
+                        <button class="btn" onclick="openChat('${uid}')" style="background:var(--text-secondary);">Send Message</button>
                     ` : `
-                        <button class="btn" onclick="editProfilePhoto()" style="margin-bottom: 10px;">📸 Change Profile Photo</button>
-                        <button class="btn" onclick="toggleTheme()" style="margin-bottom: 10px;">🎨 Change App Theme</button>
-                        <button class="btn" onclick="logout()" style="background: var(--error);">Logout</button>
+                        <button class="btn" onclick="editPhoto()" style="margin-bottom:10px;">📸 Change Photo</button>
+                        <button class="btn" onclick="toggleTheme()" style="margin-bottom:10px;">🎨 Theme</button>
+                        <button class="btn" onclick="logout()" style="background:var(--error);">Logout</button>
                     `}
                 </div>
             `;
         }
         
-        async function editProfilePhoto() {
+        async function handleProfileFollow(userId) {
+            let userRef = db.collection('users').doc(userId);
+            let curRef = db.collection('users').doc(currentUser.uid);
+            let userDoc = await userRef.get();
+            let isFollowing = userDoc.data()?.followers?.includes(currentUser.uid);
+            if (isFollowing) {
+                await userRef.update({ followers: firebase.firestore.FieldValue.arrayRemove(currentUser.uid) });
+                await curRef.update({ following: firebase.firestore.FieldValue.arrayRemove(userId) });
+                showToast(`Unfollowed ${userDoc.data().username}`);
+            } else {
+                await userRef.update({ followers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) });
+                await curRef.update({ following: firebase.firestore.FieldValue.arrayUnion(userId) });
+                showToast(`Following ${userDoc.data().username}`);
+                await db.collection('followRequests').add({
+                    fromId: currentUser.uid, fromName: currentUser.displayName, fromPhoto: currentUser.photoURL,
+                    toId: userId, status: 'pending', createdAt: new Date()
+                });
+                await loadNotifications();
+            }
+            loadProfile(userId);
+            loadDiscoverUsers();
+        }
+        
+        async function editPhoto() {
             let input = document.createElement('input');
             input.type = 'file';
             input.accept = 'image/*';
@@ -750,142 +865,67 @@
                         let url = await uploadToCloudinary(file);
                         await db.collection('users').doc(currentUser.uid).update({ photoURL: url });
                         await currentUser.updateProfile({ photoURL: url });
-                        showToast('Profile photo updated!');
-                        if (currentScreen === 'profile') loadProfile();
+                        showToast('Photo updated!');
                         render();
-                    } catch(err) { showToast('Upload failed'); }
+                    } catch(e) { showToast('Upload failed'); }
                 }
             };
             input.click();
         }
         
-        async function followUser(userId) {
-            let userRef = db.collection('users').doc(userId);
-            let curRef = db.collection('users').doc(currentUser.uid);
-            let userDoc = await userRef.get();
-            let isFollowing = userDoc.data()?.followers?.includes(currentUser.uid);
-            
-            if (isFollowing) {
-                await userRef.update({ followers: firebase.firestore.FieldValue.arrayRemove(currentUser.uid) });
-                await curRef.update({ following: firebase.firestore.FieldValue.arrayRemove(userId) });
-                showToast(`Unfollowed ${userDoc.data().username}`);
-            } else {
-                await userRef.update({ followers: firebase.firestore.FieldValue.arrayUnion(currentUser.uid) });
-                await curRef.update({ following: firebase.firestore.FieldValue.arrayUnion(userId) });
-                showToast(`Following ${userDoc.data().username}`);
-            }
-            
-            if (currentScreen === 'viewProfile') loadProfile(viewingProfileUser);
-            if (currentScreen === 'discover') loadDiscover();
-        }
-        
-        async function unfollowUser(userId) {
-            await followUser(userId);
-        }
-        
         async function showFollowList(type, userId) {
             let doc = await db.collection('users').doc(userId).get();
             let ids = type === 'followers' ? (doc.data()?.followers || []) : (doc.data()?.following || []);
-            if (ids.length === 0) {
-                showToast(`No ${type}`);
-                return;
-            }
-            
+            if (ids.length === 0) { showToast(`No ${type}`); return; }
             let users = [];
             for (let id of ids) {
                 let u = await db.collection('users').doc(id).get();
                 if (u.exists) users.push({ id: u.id, ...u.data() });
             }
-            
             let modal = document.createElement('div');
             modal.className = 'modal';
             modal.innerHTML = `
                 <div class="modal-content">
-                    <h3 style="margin-bottom: 15px;">${type === 'followers' ? 'Followers' : 'Following'}</h3>
+                    <h3 style="margin-bottom:15px;">${type === 'followers' ? 'Followers' : 'Following'}</h3>
                     ${users.map(u => `
-                        <div class="user-card" style="margin-bottom: 10px;" onclick="viewProfile('${u.id}'); document.querySelector('.modal').remove()">
-                            <img src="${u.photoURL || getDefaultAvatar(u.username)}" class="avatar" style="width: 44px; height: 44px;">
-                            <div class="user-details">
-                                <div class="user-name">${escapeHtml(u.username)}</div>
-                                <div class="user-bio">${escapeHtml(u.name || u.username)}</div>
-                            </div>
+                        <div class="user-card" style="margin-bottom:10px;" onclick="viewProfile('${u.id}'); document.querySelector('.modal').remove()">
+                            <img src="${u.photoURL || getDefaultAvatar(u.username)}" class="avatar" style="width:44px;height:44px;">
+                            <div class="user-details"><div class="user-name">${escapeHtml(u.username)}</div><div class="user-bio">${escapeHtml(u.name || u.username)}</div></div>
                         </div>
                     `).join('')}
-                    <button class="btn" onclick="this.closest('.modal').remove()" style="margin-top: 15px;">Close</button>
+                    <button class="btn" onclick="this.closest('.modal').remove()" style="margin-top:15px;">Close</button>
                 </div>
             `;
             document.body.appendChild(modal);
         }
         
-        // ========== CHAT THEMES ==========
-        function changeChatTheme() {
-            let modal = document.createElement('div');
-            modal.className = 'modal';
-            modal.innerHTML = `
-                <div class="modal-content">
-                    <h3>Choose Chat Theme</h3>
-                    <div class="theme-option" onclick="setChatTheme('default'); modal.remove()">
-                        <i class="fas fa-palette"></i> Default
-                    </div>
-                    <div class="theme-option" onclick="setChatTheme('romantic'); modal.remove()">
-                        <i class="fas fa-heart"></i> Romantic (Pink)
-                    </div>
-                    <div class="theme-option" onclick="setChatTheme('dark'); modal.remove()">
-                        <i class="fas fa-moon"></i> Dark Mode
-                    </div>
-                    <div class="theme-option" onclick="setChatTheme('nature'); modal.remove()">
-                        <i class="fas fa-leaf"></i> Nature (Green)
-                    </div>
-                    <button class="btn" onclick="this.closest('.modal').remove()" style="margin-top: 15px;">Cancel</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-        
-        function setChatTheme(themeName) {
-            let themeKey = [currentUser.uid, selectedUser.id].sort().join('_');
-            chatThemes[themeKey] = themeName;
-            localStorage.setItem('chatThemes', JSON.stringify(chatThemes));
-            showToast(`Chat theme changed to ${themeName}`);
-            loadMessages(); // Refresh with new theme
-        }
-        
-        // ========== NAVIGATION ==========
-        function goToChats() { currentScreen = 'chats'; selectedUser = null; render(); }
-        function goToDiscover() { currentScreen = 'discover'; render(); }
-        function goToProfile() { currentScreen = 'profile'; render(); }
-        function goBack() {
-            if (messagesUnsubscribe) messagesUnsubscribe();
-            currentScreen = 'chats';
-            selectedUser = null;
-            viewingProfileUser = null;
-            render();
-        }
-        
-        function toggleTheme() {
-            let themes = ['light', 'dark', 'futuristic'];
-            let currentIndex = themes.indexOf(currentTheme);
-            currentTheme = themes[(currentIndex + 1) % themes.length];
-            applyTheme();
-            showToast(`${currentTheme} theme`);
-        }
+        function goToChats() { currentTab = 'chats'; selectedUser = null; render(); setTimeout(() => loadChatUsers(), 10); }
+        function goToDiscover() { currentTab = 'discover'; render(); setTimeout(() => loadDiscoverUsers(), 10); }
+        function goToProfile() { currentTab = 'profile'; render(); }
+        function goBack() { if (messagesUnsub) messagesUnsub(); currentTab = 'chats'; selectedUser = null; render(); setTimeout(() => loadChatUsers(), 10); }
+        function toggleTheme() { let themes = ['light','dark','futuristic']; let idx = themes.indexOf(currentTheme); currentTheme = themes[(idx+1)%3]; applyTheme(); showToast(`${currentTheme} theme`); }
+        function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
         
         async function logout() {
             await updatePresence(false);
+            chatUsers = [];
+            unreadCounts.clear();
+            lastMessages.clear();
+            lastTimes.clear();
+            notifications = [];
+            notifCount = 0;
+            if (messagesUnsub) messagesUnsub();
             await auth.signOut();
             currentUser = null;
-            currentScreen = 'login';
+            currentTab = 'login';
             render();
         }
         
-        // ========== AUTH ==========
         async function handleLogin(e) {
             e.preventDefault();
             let email = document.getElementById('loginEmail').value;
-            let password = document.getElementById('loginPassword').value;
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-            } catch(err) { alert(err.message); }
+            let pass = document.getElementById('loginPassword').value;
+            try { await auth.signInWithEmailAndPassword(email, pass); } catch(err) { alert(err.message); }
         }
         
         async function handleSignup(e) {
@@ -893,13 +933,11 @@
             let username = document.getElementById('signupUsername').value;
             let name = document.getElementById('signupName').value;
             let email = document.getElementById('signupEmail').value;
-            let password = document.getElementById('signupPassword').value;
+            let pass = document.getElementById('signupPassword').value;
             let confirm = document.getElementById('signupConfirm').value;
-            
-            if (password !== confirm) { alert('Passwords do not match'); return; }
-            
+            if (pass !== confirm) { alert('Passwords do not match'); return; }
             try {
-                let cred = await auth.createUserWithEmailAndPassword(email, password);
+                let cred = await auth.createUserWithEmailAndPassword(email, pass);
                 await cred.user.updateProfile({ displayName: username });
                 await db.collection('users').doc(cred.user.uid).set({
                     uid: cred.user.uid, username, name: name || username, email,
@@ -908,151 +946,121 @@
                     online: true, lastSeen: new Date(), createdAt: new Date()
                 });
                 showToast('Account created! Please login.');
-                currentScreen = 'login';
+                currentTab = 'login';
                 render();
             } catch(err) { alert(err.message); }
         }
         
-        function showLogin() { currentScreen = 'login'; render(); }
-        function showSignup() { currentScreen = 'signup'; render(); }
+        function showLogin() { currentTab = 'login'; render(); }
+        function showSignup() { currentTab = 'signup'; render(); }
         
-        // ========== RENDER ==========
+        function totalUnread() { let t = 0; for (let c of unreadCounts.values()) t += c; return t; }
+        
         function render() {
             let app = document.getElementById('app');
-            
             if (!currentUser) {
-                if (currentScreen === 'signup') {
-                    app.innerHTML = `
-                        <div class="auth-container">
-                            <div class="auth-card">
-                                <h2>Create Account</h2>
-                                <form id="signupForm">
-                                    <input type="text" id="signupUsername" placeholder="Username" required>
-                                    <input type="text" id="signupName" placeholder="Full Name">
-                                    <input type="email" id="signupEmail" placeholder="Email" required>
-                                    <input type="password" id="signupPassword" placeholder="Password (min 6)" required>
-                                    <input type="password" id="signupConfirm" placeholder="Confirm Password" required>
-                                    <button type="submit" class="btn">Sign Up</button>
-                                </form>
-                                <button class="btn-secondary" onclick="showLogin()">Back to Login</button>
-                            </div>
-                        </div>
-                    `;
+                if (currentTab === 'signup') {
+                    app.innerHTML = `<div class="auth-container"><div class="auth-card"><div class="auth-icon">💬</div><h2>InstaGrab</h2><form id="signupForm"><input type="text" id="signupUsername" placeholder="Username"><input type="text" id="signupName" placeholder="Full Name"><input type="email" id="signupEmail" placeholder="Email"><input type="password" id="signupPassword" placeholder="Password"><input type="password" id="signupConfirm" placeholder="Confirm"><button type="submit" class="btn">Sign Up</button></form><button class="btn-secondary" onclick="showLogin()">Back to Login</button></div></div>`;
                     document.getElementById('signupForm')?.addEventListener('submit', handleSignup);
                 } else {
-                    app.innerHTML = `
-                        <div class="auth-container">
-                            <div class="auth-card">
-                                <h1>📸 InstaGrab</h1>
-                                <form id="loginForm">
-                                    <input type="email" id="loginEmail" placeholder="Email" required>
-                                    <input type="password" id="loginPassword" placeholder="Password" required>
-                                    <button type="submit" class="btn">Login</button>
-                                </form>
-                                <button class="btn-secondary" onclick="showSignup()">Create account</button>
-                            </div>
-                        </div>
-                    `;
+                    app.innerHTML = `<div class="auth-container"><div class="auth-card"><div class="auth-icon">💬</div><h2>InstaGrab</h2><form id="loginForm"><input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Password"><button type="submit" class="btn">Login</button></form><button class="btn-secondary" onclick="showSignup()">Create account</button></div></div>`;
                     document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
                 }
                 return;
             }
             
-            if (currentScreen === 'chat') {
+            let unreadTotal = totalUnread();
+            let unreadBadge = getBadge(unreadTotal);
+            let notifBadge = getBadge(notifCount);
+            
+            if (currentTab === 'chat') {
                 app.innerHTML = `
                     <div class="chat-container">
                         <div class="chat-header">
                             <button class="back-btn" onclick="goBack()">←</button>
-                            <img src="${selectedUser?.photoURL || getDefaultAvatar(selectedUser?.username)}" class="avatar chat-header-avatar" style="width: 44px; height: 44px; cursor: pointer;" onclick="viewProfile('${selectedUser?.id}')">
-                            <div style="flex: 1; cursor: pointer;" onclick="viewProfile('${selectedUser?.id}')">
+                            <img src="${selectedUser?.photoURL || getDefaultAvatar(selectedUser?.username)}" class="avatar" style="width:44px;height:44px;cursor:pointer;" onclick="viewProfile('${selectedUser?.id}')">
+                            <div style="flex:1;cursor:pointer;" onclick="viewProfile('${selectedUser?.id}')">
                                 <div class="user-name">${escapeHtml(selectedUser?.username)}</div>
-                                <div style="font-size: 11px; color: var(--text-secondary);">${selectedUser?.online ? '🟢 Online' : '⚫ Offline'}</div>
+                                <div style="font-size:11px;">${selectedUser?.online ? '🟢 Online' : '⚫ Offline'}</div>
                             </div>
-                            <button class="icon-btn" onclick="changeChatTheme()">🎨</button>
                         </div>
                         <div id="messagesArea" class="messages-area"><div class="loading">Loading...</div></div>
                         <div class="input-area">
                             <button class="icon-btn" onclick="attachFile()">📎</button>
-                            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
-                            <button class="btn" onclick="sendMessage()" style="width: auto; padding: 12px 20px;">Send</button>
+                            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                            <button class="btn" onclick="sendMessage()" style="width:auto;padding:12px 20px;">Send</button>
                         </div>
                     </div>
                 `;
                 loadMessages();
-            } else if (currentScreen === 'discover') {
+            } else if (currentTab === 'discover') {
                 app.innerHTML = `
                     <div>
                         <div class="header">
-                            <h2>🔍 Discover</h2>
+                            <div class="logo"><span class="logo-icon">💬</span><span class="logo-text">InstaGrab</span></div>
                             <div class="header-icons">
-                                <button class="icon-btn" onclick="goToProfile()"><img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName)}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;"></button>
+                                <button class="icon-btn" onclick="showNotifModal()" style="position:relative;"><i class="fas fa-bell"></i>${notifBadge ? `<span class="badge">${notifBadge}</span>` : ''}</button>
+                                <button class="icon-btn" onclick="goToProfile()"><img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></button>
                                 <button class="icon-btn" onclick="toggleTheme()">🎨</button>
                             </div>
                         </div>
-                        <div id="discoverList" class="discover-list"><div class="loading">Loading...</div></div>
+                        <div id="discoverList" class="discover-list"><div class="loading">Finding users...</div></div>
                         <div class="bottom-nav">
-                            <button class="nav-item" onclick="goToChats()"><i class="fas fa-comment"></i><span>Chats</span></button>
+                            <button class="nav-item" onclick="goToChats()" style="position:relative;"><i class="fas fa-comment"></i><span>Chats</span>${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}</button>
                             <button class="nav-item active" onclick="goToDiscover()"><i class="fas fa-compass"></i><span>Discover</span></button>
                             <button class="nav-item" onclick="goToProfile()"><i class="fas fa-user"></i><span>Profile</span></button>
                         </div>
                     </div>
                 `;
-                loadDiscover();
-            } else if (currentScreen === 'profile') {
+                loadDiscoverUsers();
+            } else if (currentTab === 'profile') {
                 app.innerHTML = `
                     <div class="profile-container">
-                        <div class="profile-header">
-                            <button class="back-btn" onclick="goToChats()">←</button>
-                            <h2>My Profile</h2>
-                        </div>
+                        <div class="profile-header"><button class="back-btn" onclick="goToChats()">←</button><h2>My Profile</h2></div>
                         <div id="profileContent"><div class="loading">Loading...</div></div>
                         <div class="bottom-nav">
-                            <button class="nav-item" onclick="goToChats()"><i class="fas fa-comment"></i><span>Chats</span></button>
+                            <button class="nav-item" onclick="goToChats()" style="position:relative;"><i class="fas fa-comment"></i><span>Chats</span>${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}</button>
                             <button class="nav-item" onclick="goToDiscover()"><i class="fas fa-compass"></i><span>Discover</span></button>
                             <button class="nav-item active" onclick="goToProfile()"><i class="fas fa-user"></i><span>Profile</span></button>
                         </div>
                     </div>
                 `;
                 loadProfile();
-            } else if (currentScreen === 'viewProfile') {
+            } else if (currentTab === 'viewProfile') {
                 app.innerHTML = `
                     <div class="profile-container">
-                        <div class="profile-header">
-                            <button class="back-btn" onclick="goBack()">←</button>
-                            <h2>Profile</h2>
-                        </div>
+                        <div class="profile-header"><button class="back-btn" onclick="goBack()">←</button><h2>Profile</h2></div>
                         <div id="profileContent"><div class="loading">Loading...</div></div>
                     </div>
                 `;
-                loadProfile(viewingProfileUser);
+                loadProfile(viewingUser);
             } else {
                 app.innerHTML = `
                     <div>
                         <div class="header">
-                            <h2>📸 InstaGrab</h2>
+                            <div class="logo"><span class="logo-icon">💬</span><span class="logo-text">InstaGrab</span></div>
                             <div class="header-icons">
-                                <button class="icon-btn" onclick="goToProfile()"><img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName)}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;"></button>
+                                <button class="icon-btn" onclick="showNotifModal()" style="position:relative;"><i class="fas fa-bell"></i>${notifBadge ? `<span class="badge">${notifBadge}</span>` : ''}</button>
+                                <button class="icon-btn" onclick="goToProfile()"><img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></button>
                                 <button class="icon-btn" onclick="toggleTheme()">🎨</button>
                             </div>
                         </div>
-                        <div id="usersList" class="users-list"><div class="loading">Loading...</div></div>
+                        <div id="usersList" class="users-list"><div class="loading">Loading chats...</div></div>
                         <div class="bottom-nav">
-                            <button class="nav-item active" onclick="goToChats()"><i class="fas fa-comment"></i><span>Chats</span></button>
+                            <button class="nav-item active" onclick="goToChats()" style="position:relative;"><i class="fas fa-comment"></i><span>Chats</span>${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}</button>
                             <button class="nav-item" onclick="goToDiscover()"><i class="fas fa-compass"></i><span>Discover</span></button>
                             <button class="nav-item" onclick="goToProfile()"><i class="fas fa-user"></i><span>Profile</span></button>
                         </div>
                     </div>
                 `;
-                loadUsers();
+                loadChatUsers();
+                loadNotifications();
             }
         }
         
-        // Make functions global
         window.openChat = openChat;
         window.sendMessage = sendMessage;
         window.viewProfile = viewProfile;
-        window.followUser = followUser;
-        window.unfollowUser = unfollowUser;
         window.goToChats = goToChats;
         window.goToDiscover = goToDiscover;
         window.goToProfile = goToProfile;
@@ -1064,11 +1072,15 @@
         window.showFollowList = showFollowList;
         window.attachFile = attachFile;
         window.cancelAttachment = cancelAttachment;
-        window.editProfilePhoto = editProfilePhoto;
-        window.changeChatTheme = changeChatTheme;
-        window.setChatTheme = setChatTheme;
+        window.editPhoto = editPhoto;
+        window.showNotifModal = showNotifModal;
+        window.handleNotif = handleNotif;
+        window.handleFollow = handleFollow;
+        window.handleProfileFollow = handleProfileFollow;
+        window.editMessage = editMessage;
+        window.deleteMessage = deleteMessage;
+        window.handleKeyPress = handleKeyPress;
         
-        // ========== AUTH STATE ==========
         auth.onAuthStateChanged(async (user) => {
             currentUser = user;
             if (user) {
@@ -1076,20 +1088,16 @@
                 let doc = await ref.get();
                 if (!doc.exists) {
                     await ref.set({
-                        uid: user.uid,
-                        username: user.displayName || user.email.split('@')[0],
-                        email: user.email,
-                        photoURL: getDefaultAvatar(user.displayName || user.email),
-                        bio: '',
-                        isPrivate: false,
-                        followers: [],
-                        following: [],
-                        online: true,
-                        lastSeen: new Date(),
-                        createdAt: new Date()
+                        uid: user.uid, username: user.displayName || user.email.split('@')[0], email: user.email,
+                        photoURL: getDefaultAvatar(user.displayName || user.email), bio: '',
+                        isPrivate: false, followers: [], following: [],
+                        online: true, lastSeen: new Date(), createdAt: new Date()
                     });
                 }
-                currentScreen = 'chats';
+                currentTab = 'chats';
+                await loadNotifications();
+                db.collection('followRequests').where('toId','==',currentUser.uid).onSnapshot(() => loadNotifications());
+                db.collection('messageRequests').where('toId','==',currentUser.uid).onSnapshot(() => loadNotifications());
             }
             render();
         });
