@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
     <title>InstaGrab</title>
-    <link rel="icon" type="image/png" href="https://img.icons8.com/color/96/chat--v1.png">
-    <link rel="apple-touch-icon" href="https://img.icons8.com/color/96/chat--v1.png">
+
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/128/725/725339.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/128/725/725339.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body.light { --bg: #ffffff; --surface: #f5f5f5; --primary: #405DE6; --text: #111; --text-secondary: #666; --border: #e0e0e0; --online: #4caf50; --offline: #9e9e9e; --error: #f44336; --input-bg: #fff; --notification: #ef4444; --success: #4caf50; }
@@ -39,7 +39,15 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             text-align: center;
         }
-        .auth-icon { font-size: 60px; margin-bottom: 15px; }
+        .auth-icon { 
+            font-size: 70px; 
+            margin-bottom: 15px;
+            display: inline-block;
+            background: linear-gradient(135deg, #405DE6, #833AB4);
+            border-radius: 20px;
+            padding: 15px;
+            color: white;
+        }
         .auth-card input {
             width: 100%; padding: 14px; margin-bottom: 15px;
             border: 1px solid #ddd; border-radius: 12px;
@@ -70,7 +78,13 @@
             z-index: 100;
         }
         .logo { display: flex; align-items: center; gap: 8px; }
-        .logo-icon { font-size: 28px; }
+        .logo-icon { 
+            font-size: 28px; 
+            background: linear-gradient(135deg, #405DE6, #833AB4);
+            border-radius: 10px;
+            padding: 4px;
+            color: white;
+        }
         .logo-text { font-size: 20px; font-weight: 700; background: linear-gradient(135deg, var(--primary), #833AB4); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .header-icons { display: flex; gap: 12px; align-items: center; }
         .icon-btn {
@@ -353,7 +367,6 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        
         const firebaseConfig = {
             apiKey: "AIzaSyAXfH_DdBYRs_icgNVrs0CaEgGBovZU7C0",
             authDomain: "instgrab-eb68e.firebaseapp.com",
@@ -367,7 +380,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        
+        // Request notification permission
         if ('Notification' in window && Notification.permission !== 'granted') {
             Notification.requestPermission();
         }
@@ -400,7 +413,8 @@
         let pendingFile = null;
         let notifications = [];
         let notifCount = 0;
-        let chatListenerActive = false;
+        let isLoading = false;
+        let usersLoaded = false;
         
         const CLOUD_NAME = "dx1irhsdq";
         const UPLOAD_PRESET = "instagrab_preset";
@@ -537,13 +551,27 @@
             render();
         }
         
-        // 🔥 MAIN FUNCTION - Loads chat users sorted by latest message
-        async function loadChatUsers() {
+        // 🔥 SUPER FAST - Loads users instantly from cache
+        function loadChatUsers() {
             let container = document.getElementById('usersList');
-            if (!container || chatListenerActive) return;
+            if (!container) return;
             
-            chatListenerActive = true;
+            // If we already have users, display immediately
+            if (chatUsers.length > 0) {
+                displayChatUsers(chatUsers);
+                // Refresh in background
+                refreshChatUsers();
+                return;
+            }
+            
+            // First load - show loading
             container.innerHTML = '<div class="loading">Loading chats...</div>';
+            refreshChatUsers();
+        }
+        
+        async function refreshChatUsers() {
+            if (isLoading) return;
+            isLoading = true;
             
             try {
                 let snapshot = await db.collection('users').where('uid', '!=', currentUser.uid).get();
@@ -557,7 +585,6 @@
                     if (!lastMsg.empty) {
                         let data = lastMsg.docs[0].data();
                         lastMessages.set(user.id, data.text || '📎');
-                        // 🔥 Store the timestamp of the latest message
                         lastTimes.set(user.id, data.timestamp?.toDate?.() || new Date(0));
                         let unread = await db.collection(`chats/${chatId}/messages`).where('receiverId', '==', currentUser.uid).where('read', '==', false).get();
                         unreadCounts.set(user.id, unread.size);
@@ -565,7 +592,6 @@
                     }
                 }
                 
-               
                 chatUsersList.sort((a, b) => {
                     let timeA = lastTimes.get(a.id) || new Date(0);
                     let timeB = lastTimes.get(b.id) || new Date(0);
@@ -573,39 +599,45 @@
                 });
                 
                 chatUsers = chatUsersList;
-                
-                if (chatUsers.length === 0) {
-                    container.innerHTML = '<div class="loading">✨ No chats yet! Go to Discover to find friends.</div>';
-                    return;
-                }
-                
-                container.innerHTML = chatUsers.map(user => {
-                    let unread = unreadCounts.get(user.id) || 0;
-                    let last = lastMessages.get(user.id) || '';
-                    let avatar = user.photoURL || getDefaultAvatar(user.username);
-                    let unreadBadge = unread > 9 ? '9+' : (unread > 0 ? unread : '');
-                    let time = lastTimes.get(user.id);
-                    let timeDisplay = time ? formatTime(time) : '';
-                    
-                    return `
-                        <div class="user-card" onclick="openChat('${user.id}')">
-                            <div class="avatar-container">
-                                <img src="${avatar}" class="avatar" onerror="this.src='${getDefaultAvatar(user.username)}'">
-                                <div class="online-dot" style="background: ${user.online ? 'var(--online)' : 'var(--offline)'};"></div>
-                            </div>
-                            <div class="user-details">
-                                <div class="user-name">${escapeHtml(user.username)}</div>
-                                <div class="last-msg">${last ? escapeHtml(last.substring(0,40)) : 'Say hi!'}</div>
-                            </div>
-                            <div style="display:flex;align-items:center;gap:8px;">
-                                ${timeDisplay ? `<div style="font-size:10px;color:var(--text-secondary);">${timeDisplay}</div>` : ''}
-                                ${unreadBadge ? `<div class="unread-badge">${unreadBadge}</div>` : ''}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                displayChatUsers(chatUsers);
             } catch(e) { console.error(e); }
-            chatListenerActive = false;
+            isLoading = false;
+        }
+        
+        function displayChatUsers(users) {
+            let container = document.getElementById('usersList');
+            if (!container) return;
+            
+            if (users.length === 0) {
+                container.innerHTML = '<div class="loading">✨ No chats yet! Go to Discover to find friends.</div>';
+                return;
+            }
+            
+            container.innerHTML = users.map(user => {
+                let unread = unreadCounts.get(user.id) || 0;
+                let last = lastMessages.get(user.id) || '';
+                let avatar = user.photoURL || getDefaultAvatar(user.username);
+                let unreadBadge = unread > 9 ? '9+' : (unread > 0 ? unread : '');
+                let time = lastTimes.get(user.id);
+                let timeDisplay = time ? formatTime(time) : '';
+                
+                return `
+                    <div class="user-card" onclick="openChat('${user.id}')">
+                        <div class="avatar-container">
+                            <img src="${avatar}" class="avatar" onerror="this.src='${getDefaultAvatar(user.username)}'">
+                            <div class="online-dot" style="background: ${user.online ? 'var(--online)' : 'var(--offline)'};"></div>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name">${escapeHtml(user.username)}</div>
+                            <div class="last-msg">${last ? escapeHtml(last.substring(0,40)) : 'Say hi!'}</div>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            ${timeDisplay ? `<div style="font-size:10px;color:var(--text-secondary);">${timeDisplay}</div>` : ''}
+                            ${unreadBadge ? `<div class="unread-badge">${unreadBadge}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
         
         async function loadDiscoverUsers() {
@@ -761,10 +793,8 @@
             if (text) {
                 await db.collection(`chats/${chatId}/messages`).add({ text, senderId: currentUser.uid, receiverId: selectedUser.id, timestamp: new Date(), read: false });
                 input.value = '';
-                
                 lastTimes.set(selectedUser.id, new Date());
-                
-                setTimeout(() => loadChatUsers(), 100);
+                refreshChatUsers();
             }
         }
         
@@ -899,10 +929,10 @@
             document.body.appendChild(modal);
         }
         
-        function goToChats() { currentTab = 'chats'; selectedUser = null; render(); setTimeout(() => loadChatUsers(), 10); }
-        function goToDiscover() { currentTab = 'discover'; render(); setTimeout(() => loadDiscoverUsers(), 10); }
+        function goToChats() { currentTab = 'chats'; selectedUser = null; render(); loadChatUsers(); }
+        function goToDiscover() { currentTab = 'discover'; render(); loadDiscoverUsers(); }
         function goToProfile() { currentTab = 'profile'; render(); }
-        function goBack() { if (messagesUnsub) messagesUnsub(); currentTab = 'chats'; selectedUser = null; render(); setTimeout(() => loadChatUsers(), 10); }
+        function goBack() { if (messagesUnsub) messagesUnsub(); currentTab = 'chats'; selectedUser = null; render(); loadChatUsers(); }
         function toggleTheme() { let themes = ['light','dark','futuristic']; let idx = themes.indexOf(currentTheme); currentTheme = themes[(idx+1)%3]; applyTheme(); showToast(`${currentTheme} theme`); }
         function handleKeyPress(e) { if (e.key === 'Enter') sendMessage(); }
         
@@ -960,10 +990,39 @@
             let app = document.getElementById('app');
             if (!currentUser) {
                 if (currentTab === 'signup') {
-                    app.innerHTML = `<div class="auth-container"><div class="auth-card"><div class="auth-icon">💬</div><h2>InstaGrab</h2><form id="signupForm"><input type="text" id="signupUsername" placeholder="Username"><input type="text" id="signupName" placeholder="Full Name"><input type="email" id="signupEmail" placeholder="Email"><input type="password" id="signupPassword" placeholder="Password"><input type="password" id="signupConfirm" placeholder="Confirm"><button type="submit" class="btn">Sign Up</button></form><button class="btn-secondary" onclick="showLogin()">Back to Login</button></div></div>`;
+                    app.innerHTML = `
+                        <div class="auth-container">
+                            <div class="auth-card">
+                                <div class="auth-icon">💬</div>
+                                <h2 style="margin-bottom: 20px;">InstaGrab</h2>
+                                <form id="signupForm">
+                                    <input type="text" id="signupUsername" placeholder="Username">
+                                    <input type="text" id="signupName" placeholder="Full Name">
+                                    <input type="email" id="signupEmail" placeholder="Email">
+                                    <input type="password" id="signupPassword" placeholder="Password">
+                                    <input type="password" id="signupConfirm" placeholder="Confirm">
+                                    <button type="submit" class="btn">Sign Up</button>
+                                </form>
+                                <button class="btn-secondary" onclick="showLogin()">Back to Login</button>
+                            </div>
+                        </div>
+                    `;
                     document.getElementById('signupForm')?.addEventListener('submit', handleSignup);
                 } else {
-                    app.innerHTML = `<div class="auth-container"><div class="auth-card"><div class="auth-icon">💬</div><h2>InstaGrab</h2><form id="loginForm"><input type="email" id="loginEmail" placeholder="Email"><input type="password" id="loginPassword" placeholder="Password"><button type="submit" class="btn">Login</button></form><button class="btn-secondary" onclick="showSignup()">Create account</button></div></div>`;
+                    app.innerHTML = `
+                        <div class="auth-container">
+                            <div class="auth-card">
+                                <div class="auth-icon">💬</div>
+                                <h2 style="margin-bottom: 20px;">InstaGrab</h2>
+                                <form id="loginForm">
+                                    <input type="email" id="loginEmail" placeholder="Email">
+                                    <input type="password" id="loginPassword" placeholder="Password">
+                                    <button type="submit" class="btn">Login</button>
+                                </form>
+                                <button class="btn-secondary" onclick="showSignup()">Create account</button>
+                            </div>
+                        </div>
+                    `;
                     document.getElementById('loginForm')?.addEventListener('submit', handleLogin);
                 }
                 return;
@@ -997,16 +1056,28 @@
                 app.innerHTML = `
                     <div>
                         <div class="header">
-                            <div class="logo"><span class="logo-icon">💬</span><span class="logo-text">InstaGrab</span></div>
+                            <div class="logo">
+                                <span class="logo-icon">💬</span>
+                                <span class="logo-text">InstaGrab</span>
+                            </div>
                             <div class="header-icons">
-                                <button class="icon-btn" onclick="showNotifModal()" style="position:relative;"><i class="fas fa-bell"></i>${notifBadge ? `<span class="badge">${notifBadge}</span>` : ''}</button>
-                                <button class="icon-btn" onclick="goToProfile()"><img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></button>
+                                <button class="icon-btn" onclick="showNotifModal()" style="position:relative;">
+                                    <i class="fas fa-bell"></i>
+                                    ${notifBadge ? `<span class="badge">${notifBadge}</span>` : ''}
+                                </button>
+                                <button class="icon-btn" onclick="goToProfile()">
+                                    <img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+                                </button>
                                 <button class="icon-btn" onclick="toggleTheme()">🎨</button>
                             </div>
                         </div>
                         <div id="discoverList" class="discover-list"><div class="loading">Finding users...</div></div>
                         <div class="bottom-nav">
-                            <button class="nav-item" onclick="goToChats()" style="position:relative;"><i class="fas fa-comment"></i><span>Chats</span>${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}</button>
+                            <button class="nav-item" onclick="goToChats()" style="position:relative;">
+                                <i class="fas fa-comment"></i>
+                                <span>Chats</span>
+                                ${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}
+                            </button>
                             <button class="nav-item active" onclick="goToDiscover()"><i class="fas fa-compass"></i><span>Discover</span></button>
                             <button class="nav-item" onclick="goToProfile()"><i class="fas fa-user"></i><span>Profile</span></button>
                         </div>
@@ -1016,10 +1087,17 @@
             } else if (currentTab === 'profile') {
                 app.innerHTML = `
                     <div class="profile-container">
-                        <div class="profile-header"><button class="back-btn" onclick="goToChats()">←</button><h2>My Profile</h2></div>
+                        <div class="profile-header">
+                            <button class="back-btn" onclick="goToChats()">←</button>
+                            <h2>My Profile</h2>
+                        </div>
                         <div id="profileContent"><div class="loading">Loading...</div></div>
                         <div class="bottom-nav">
-                            <button class="nav-item" onclick="goToChats()" style="position:relative;"><i class="fas fa-comment"></i><span>Chats</span>${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}</button>
+                            <button class="nav-item" onclick="goToChats()" style="position:relative;">
+                                <i class="fas fa-comment"></i>
+                                <span>Chats</span>
+                                ${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}
+                            </button>
                             <button class="nav-item" onclick="goToDiscover()"><i class="fas fa-compass"></i><span>Discover</span></button>
                             <button class="nav-item active" onclick="goToProfile()"><i class="fas fa-user"></i><span>Profile</span></button>
                         </div>
@@ -1029,7 +1107,10 @@
             } else if (currentTab === 'viewProfile') {
                 app.innerHTML = `
                     <div class="profile-container">
-                        <div class="profile-header"><button class="back-btn" onclick="goBack()">←</button><h2>Profile</h2></div>
+                        <div class="profile-header">
+                            <button class="back-btn" onclick="goBack()">←</button>
+                            <h2>Profile</h2>
+                        </div>
                         <div id="profileContent"><div class="loading">Loading...</div></div>
                     </div>
                 `;
@@ -1038,16 +1119,28 @@
                 app.innerHTML = `
                     <div>
                         <div class="header">
-                            <div class="logo"><span class="logo-icon">💬</span><span class="logo-text">InstaGrab</span></div>
+                            <div class="logo">
+                                <span class="logo-icon">💬</span>
+                                <span class="logo-text">InstaGrab</span>
+                            </div>
                             <div class="header-icons">
-                                <button class="icon-btn" onclick="showNotifModal()" style="position:relative;"><i class="fas fa-bell"></i>${notifBadge ? `<span class="badge">${notifBadge}</span>` : ''}</button>
-                                <button class="icon-btn" onclick="goToProfile()"><img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;"></button>
+                                <button class="icon-btn" onclick="showNotifModal()" style="position:relative;">
+                                    <i class="fas fa-bell"></i>
+                                    ${notifBadge ? `<span class="badge">${notifBadge}</span>` : ''}
+                                </button>
+                                <button class="icon-btn" onclick="goToProfile()">
+                                    <img src="${currentUser?.photoURL || getDefaultAvatar(currentUser?.displayName)}" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+                                </button>
                                 <button class="icon-btn" onclick="toggleTheme()">🎨</button>
                             </div>
                         </div>
                         <div id="usersList" class="users-list"><div class="loading">Loading chats...</div></div>
                         <div class="bottom-nav">
-                            <button class="nav-item active" onclick="goToChats()" style="position:relative;"><i class="fas fa-comment"></i><span>Chats</span>${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}</button>
+                            <button class="nav-item active" onclick="goToChats()" style="position:relative;">
+                                <i class="fas fa-comment"></i>
+                                <span>Chats</span>
+                                ${unreadBadge ? `<span class="nav-badge">${unreadBadge}</span>` : ''}
+                            </button>
                             <button class="nav-item" onclick="goToDiscover()"><i class="fas fa-compass"></i><span>Discover</span></button>
                             <button class="nav-item" onclick="goToProfile()"><i class="fas fa-user"></i><span>Profile</span></button>
                         </div>
