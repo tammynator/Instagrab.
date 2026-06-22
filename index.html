@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="https://img.icons8.com/color/96/chat--v1.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* Complete CSS same as before - included in full code below */
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body.light { --bg: #ffffff; --surface: #f5f5f5; --primary: #405DE6; --text: #111; --text-secondary: #666; --border: #e0e0e0; --online: #4caf50; --offline: #9e9e9e; --error: #f44336; --input-bg: #fff; --notification: #ef4444; --success: #4caf50; }
@@ -353,7 +353,7 @@
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
     <script>
-        // Firebase Config
+        
         const firebaseConfig = {
             apiKey: "AIzaSyAXfH_DdBYRs_icgNVrs0CaEgGBovZU7C0",
             authDomain: "instgrab-eb68e.firebaseapp.com",
@@ -367,7 +367,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // Request notification permission
+        
         if ('Notification' in window && Notification.permission !== 'granted') {
             Notification.requestPermission();
         }
@@ -565,7 +565,7 @@
                     }
                 }
                 
-                // 🔥 Sort by latest message time (newest first)
+               
                 chatUsersList.sort((a, b) => {
                     let timeA = lastTimes.get(a.id) || new Date(0);
                     let timeB = lastTimes.get(b.id) || new Date(0);
@@ -761,9 +761,9 @@
             if (text) {
                 await db.collection(`chats/${chatId}/messages`).add({ text, senderId: currentUser.uid, receiverId: selectedUser.id, timestamp: new Date(), read: false });
                 input.value = '';
-                // Update last message time for sorting
+                
                 lastTimes.set(selectedUser.id, new Date());
-                // Refresh chat list to re-sort
+                
                 setTimeout(() => loadChatUsers(), 100);
             }
         }
